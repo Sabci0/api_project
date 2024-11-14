@@ -1,26 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { UserProvider } from './context/UserContext';
+import ProtectedWrapper from './components/ProtectedWrapper';
+import FakeLoginComponent from './components/FakeLoginComponent';
+import FakeRegisterComponent from './components/FakeRegisterComponent';
+import UserAvatar from './components/UserAvatar';
 import './App.css';
 
-function App() {
+const Invoices = lazy(() => import('./components/Invoices'));
+
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <UserProvider>
+      <Router>
+        <UserAvatar />
+        <Routes>
+          <Route path="/login" element={<FakeLoginComponent />} />
+          <Route path="/register" element={<FakeRegisterComponent />} />
+          <Route
+            path="/invoices"
+            element={
+              <ProtectedWrapper>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Invoices />
+                </Suspense>
+              </ProtectedWrapper>
+            }
+          />
+        </Routes>
+      </Router>
+    </UserProvider>
   );
-}
+};
 
 export default App;
